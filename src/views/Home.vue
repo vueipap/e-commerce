@@ -1,8 +1,7 @@
 <template>
-  <div class="row">
     <div class="container">
-      <div class="row">
-        <div class="col justify-content-center">
+      <div class="row mt-4 mb-2">
+        <div class="col d-flex justify-content-center">
           <div
             class="btn-group"
             role="group"
@@ -10,8 +9,8 @@
           >
             <button
               type="button"
-              @click="filtrarCategorias(categoria.id)"
-              class="btn btn-outline-primary"
+              @click="fetchProductos({categoria:categoria.id})"
+              class="btn btn-outline-success"
               v-for="categoria in categorias"
               :key="categoria.id"
             >
@@ -21,15 +20,15 @@
         </div>
       </div>
       <div class="row">
-        <div class="col" v-for="(producto, index) in productos" :key="index">
+        <div class="col col-md-4" v-for="(producto, index) in productos" :key="index">
           <CardProducto :producto="producto" />
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
+import {mapActions, mapGetters} from "vuex"
 import CardProducto from "@/components/CardProducto";
 export default {
   name: "home-app",
@@ -41,17 +40,16 @@ export default {
   },
   data() {
     return {
-      productos: [],
       categorias: [],
     };
   },
+
+  computed: {
+    ...mapGetters(['productos'])
+  },
   async created() {
     try {
-      const response = await this.$http.get(
-        "https://api-ecommerce-vue.herokuapp.com/productos"
-      );
-      this.productos = response.data;
-
+      this.fetchProductos();
       const responseCategorias = await this.$http.get(
         "https://api-ecommerce-vue.herokuapp.com/categorias"
       );
@@ -62,6 +60,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(['fetchProductos']),
     async filtrarCategorias(categoria){
       const response = await this.$http.get(`https://api-ecommerce-vue.herokuapp.com/productos?categoria=${categoria}`)
       this.productos = response.data
